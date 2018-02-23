@@ -1,13 +1,14 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
-
-namespace AzenixBot
+﻿namespace AzenixBot
 {
+    using Discord;
+    using Discord.Commands;
+    using Discord.WebSocket;
+    using Microsoft.Extensions.DependencyInjection;
+    using System;
+    using System.Reflection;
+    using System.Threading.Tasks;
+    using AzenixBot.Common;
+
     class Program
     {
         static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
@@ -29,12 +30,15 @@ namespace AzenixBot
             var botToken = "NDExNzc0OTA2NzYyNjU3Nzky.DWA85Q.xemCrzR1fXepMETOVh9ImbOdJBI";
 
             this.Client.Log += Log;
+            this.Client.MessageReceived += HandleCommandAsync;
 
             await RegisterCommandsAsync();
 
             await this.Client.LoginAsync(TokenType.Bot, botToken);
 
             await this.Client.StartAsync();
+
+            await this.Client.SetGameAsPrice();
 
             await Task.Delay(-1);
         }
@@ -48,8 +52,6 @@ namespace AzenixBot
 
         public async Task RegisterCommandsAsync()
         {
-            this.Client.MessageReceived += HandleCommandAsync;
-
             await this.Commands.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
@@ -64,7 +66,7 @@ namespace AzenixBot
 
             var argPos = 0;
 
-            if (msg.HasStringPrefix("!azx", ref argPos) || msg.HasMentionPrefix(this.Client.CurrentUser, ref argPos))
+            if (msg.HasStringPrefix("//", ref argPos) || msg.HasMentionPrefix(this.Client.CurrentUser, ref argPos))
             {
                 var context = new SocketCommandContext(this.Client, msg);
                 var result = await this.Commands.ExecuteAsync(context, argPos, this.Services);
