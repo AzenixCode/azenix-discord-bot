@@ -11,13 +11,13 @@
 
     class Program
     {
-        static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
+        static void Main(string[] args) => new Program().RunBotAsync(args[0]).GetAwaiter().GetResult();
 
         private DiscordSocketClient Client { get; set; }
         private CommandService Commands { get; set; }
         private IServiceProvider Services { get; set; }
 
-        public async Task RunBotAsync()
+        public async Task RunBotAsync(string botToken)
         {
             this.Client = new DiscordSocketClient();
             this.Commands = new CommandService();
@@ -26,8 +26,6 @@
                 .AddSingleton(this.Client)
                 .AddSingleton(this.Commands)
                 .BuildServiceProvider();
-
-            var botToken = "NDExNzc0OTA2NzYyNjU3Nzky.DWA85Q.xemCrzR1fXepMETOVh9ImbOdJBI";
 
             this.Client.Log += Log;
             this.Client.MessageReceived += HandleCommandAsync;
